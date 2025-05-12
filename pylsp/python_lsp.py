@@ -296,6 +296,7 @@ class PythonLSPServer(MethodDispatcher):
             },
             "referencesProvider": True,
             "renameProvider": True,
+            "typeDefinitionProvider": True,
             "foldingRangeProvider": True,
             "signatureHelpProvider": {"triggerCharacters": ["(", ",", "="]},
             "textDocumentSync": {
@@ -547,6 +548,10 @@ class PythonLSPServer(MethodDispatcher):
     def rename(self, doc_uri, position, new_name):
         return self._hook("pylsp_rename", doc_uri, position=position, new_name=new_name)
 
+    def type_definition(self, doc_uri, position):
+        res = self._hook("pylsp_type_definition", doc_uri, position=position)
+        return res
+
     def signature_help(self, doc_uri, position):
         return self._hook("pylsp_signature_help", doc_uri, position=position)
 
@@ -783,6 +788,9 @@ class PythonLSPServer(MethodDispatcher):
 
     def m_text_document__semantic_tokens__full(self, textDocument=None, **_kwargs):
         return self.semantic_tokens(textDocument["uri"])
+
+    def m_text_document__type_definition(self, textDocument=None, position=None, **_kwargs):
+        return self.type_definition(textDocument["uri"], position)
 
     def m_text_document__document_symbol(self, textDocument=None, **_kwargs):
         return self.document_symbols(textDocument["uri"])
